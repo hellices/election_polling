@@ -1,44 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 대한민국 정당/후보 지지율 시각화
 
-## Getting Started
+이 프로젝트는 대한민국의 정당 및 대선 후보 지지율 데이터를 시각화하는 개인 실험 프로젝트입니다.
 
-First, run the development server:
+## 기능
+
+- 정당별 지지율 트렌드 시각화
+- 대선 후보 지지율 시각화 (🚧 공사중)
+- 조사기관별 필터링
+- 상세 데이터 테이블 제공
+
+## 기술 스택
+
+- Next.js
+- TypeScript
+- SQLite3
+- Recharts
+- Tailwind CSS
+
+## 데이터
+
+- 데이터는 [중앙선거여론조사심의위원회](https://nesdc.go.kr/)에서 제공하는 정보를 활용했습니다
+- 개인적인 테스트 목적으로만 사용되었으며, 공식적인 용도로 사용할 수 없습니다
+- `data/party.csv`에서 기초 데이터를 관리
+- SQLite 데이터베이스를 통해 데이터 저장 및 조회
+
+## 실행 방법
 
 ```bash
+# 1. 의존성 설치
+npm install
+
+# 2. 데이터베이스 초기화
+npm run db:reset
+
+# 3. CSV 데이터 임포트
+npm run db:seed
+
+# 4. 개발 서버 실행 (http://localhost:3000)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 사용된 명령어 설명
+- `db:reset`: SQLite 데이터베이스를 초기화하고 테이블을 생성합니다
+- `db:seed`: CSV 파일의 데이터를 데이터베이스에 임포트합니다
+- `dev`: 개발 서버를 실행합니다
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 주의사항
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+이 프로젝트는 학습 및 실험 목적으로 만들어졌으며, 실제 데이터는 테스트용으로만 사용되었습니다. 
+데이터의 정확성이나 최신성을 보장하지 않습니다.
 
-## Learn More
+## 스크린샷
 
-To learn more about Next.js, take a look at the following resources:
+![정당 지지율 차트]
+- 정당별 지지율 추이를 시각적으로 확인할 수 있습니다
+- 조사기관별 필터링이 가능합니다
+- 마우스 오버 시 상세 정보를 확인할 수 있습니다
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 작성자
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-# election
-
-Prisma ORM has been removed. The project now uses better-sqlite3 for direct SQLite access.
-
-- You can safely delete the `prisma/` folder (including `schema.prisma`, `dev.db`, and `dev.db-journal`) if you do not need the old schema or data.
-- All Prisma-related code and dependencies have been removed.
-- Database access is now handled in `src/app/api/polling-data/route.ts` using better-sqlite3.
+inhwan Hwang
