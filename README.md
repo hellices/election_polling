@@ -13,7 +13,6 @@
 
 - Next.js
 - TypeScript
-- SQLite3
 - Recharts
 - Tailwind CSS
 
@@ -22,7 +21,6 @@
 - 데이터는 [중앙선거여론조사심의위원회](https://nesdc.go.kr/)에서 제공하는 정보를 활용했습니다
 - 개인적인 테스트 목적으로만 사용되었으며, 공식적인 용도로 사용할 수 없습니다
 - `data/party.csv`에서 기초 데이터를 관리
-- SQLite 데이터베이스를 통해 데이터 저장 및 조회
 
 ## 실행 방법
 
@@ -30,19 +28,15 @@
 # 1. 의존성 설치
 npm install
 
-# 2. 데이터베이스 초기화
-npm run db:reset
+# 2. CSV 데이터를 JSON으로 변환
+npm run export-data
 
-# 3. CSV 데이터 임포트
-npm run db:seed
-
-# 4. 개발 서버 실행 (http://localhost:3000)
+# 3. 개발 서버 실행 (http://localhost:3000)
 npm run dev
 ```
 
 ## 사용된 명령어 설명
-- `db:reset`: SQLite 데이터베이스를 초기화하고 테이블을 생성합니다
-- `db:seed`: CSV 파일의 데이터를 데이터베이스에 임포트합니다
+- `export-data`: CSV 파일의 데이터를 JSON으로 변환합니다
 - `dev`: 개발 서버를 실행합니다
 
 ## 주의사항
