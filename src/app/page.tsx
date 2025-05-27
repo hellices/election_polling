@@ -33,11 +33,24 @@ export default function HomePage() {
   const [partyChartData, setPartyChartData] = useState<ChartData[]>([]);
   const [allAgencies, setAllAgencies] = useState<string[]>([]);
   const [selectedAgencies, setSelectedAgencies] = useState<string[]>([]);
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
 
   // 필터링된 데이터를 반환하는 함수
   const getFilteredData = (data: ChartData[]) => {
     if (selectedAgencies.length === 0) return [];
-    return data.filter(item => selectedAgencies.includes(item.agency));
+    let filteredData = data.filter(item => selectedAgencies.includes(item.agency));
+    
+    // 날짜 범위 필터링
+    if (startDate) {
+      filteredData = filteredData.filter(item => new Date(item.date) >= new Date(startDate));
+    }
+    if (endDate) {
+      filteredData = filteredData.filter(item => new Date(item.date) <= new Date(endDate));
+    }
+    
+    // 조사 종료일 기준 내림차순으로 정렬
+    return filteredData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   };
 
   useEffect(() => {
@@ -68,7 +81,7 @@ export default function HomePage() {
             date: poll.date,
             agency: poll.agency,
             ...poll.support
-          })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          }));
           setPartyChartData(formattedForChart);
         }
       } catch (error) {
@@ -103,14 +116,6 @@ export default function HomePage() {
     <main className="flex min-h-screen flex-col items-center p-8 md:p-24 space-y-12">
       <h1 className="text-2xl font-bold mb-4">대한민국 선거 지지율 추이</h1>
       
-      {/* Candidate Polling Chart Section */}
-      <section className="w-full max-w-5xl">
-        <h2 className="text-2xl font-semibold mb-6 text-center">대선 후보 지지율</h2>
-        <div className="w-full max-w-4xl mx-auto mb-8 p-4 border rounded-lg shadow">
-          <PollChart data={candidatePollData} />
-        </div>
-      </section>
-
       {/* Party Support Section */}
       <section className="w-full max-w-5xl">
         <h2 className="text-2xl font-semibold mb-6 text-center">정당 지지율 현황</h2>
@@ -138,6 +143,33 @@ export default function HomePage() {
                 <span className="text-sm">{agency}</span>
               </label>
             ))}
+          </div>
+        </div>
+        
+        {/* 기간 검색 필터 */}
+        <div className="mb-6 p-4 border rounded-lg">
+          <h3 className="text-lg font-medium mb-2">기간 검색</h3>
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+              <label htmlFor="startDate" className="text-sm whitespace-nowrap">시작일:</label>
+              <input
+                id="startDate"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="border rounded p-1 text-sm"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label htmlFor="endDate" className="text-sm whitespace-nowrap">종료일:</label>
+              <input
+                id="endDate"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="border rounded p-1 text-sm"
+              />
+            </div>
           </div>
         </div>
         
