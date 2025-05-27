@@ -1,13 +1,7 @@
 import { getDb } from '@/lib/db'; // Adjusted import path
 import { NextRequest, NextResponse } from 'next/server';
 
-// Define party names here, ideally this would be from a shared constants file
-const ALL_PARTY_NAMES = [
-  "더불어민주당", "국민의힘", "조국혁신당", "개혁신당",
-  "진보당", "새로운미래", "기본소득당", "사회민주당"
-];
-
-export async function GET(request: NextRequest) {
+export async function GET() {
   const db = getDb();
   try {
     // Fetch candidate polling data (existing logic)
@@ -24,7 +18,14 @@ export async function GET(request: NextRequest) {
     const partySupportProcessed: { agency: string; date: string; support: { [key: string]: number } }[] = [];
     const tempPartyDataHolder: { [key: string]: { agency: string; date: string; support: { [key: string]: number } } } = {};
 
-    for (const row of partySupportRaw as any[]) {
+    interface PartySupport {
+      agency: string;
+      date: string;
+      partyName: string;
+      supportPercentage: number;
+    }
+
+    for (const row of partySupportRaw as PartySupport[]) {
       const key = `${row.agency}-${row.date}`;
       if (!tempPartyDataHolder[key]) {
         tempPartyDataHolder[key] = {

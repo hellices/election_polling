@@ -1,6 +1,5 @@
 "use client";
 
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { PollChart } from '@/components/ui/chart';
 
@@ -9,16 +8,36 @@ const partyNames = [
   "진보당", "기타정당", "지지정당 없음", "모름/무응답"
 ];
 
+interface ApiPollData {
+  candidatePolls: Array<{
+    candidateName: string;
+    party: string;
+    date: string;
+    percentage: number;
+  }>;
+  partySupport: Array<{
+    agency: string;
+    date: string;
+    support: Record<string, number>;
+  }>;
+}
+
+interface ChartData {
+  [key: string]: string | number;
+  date: string;
+  agency: string;
+}
+
 export default function HomePage() {
-  const [candidatePollData, setCandidatePollData] = useState<any[]>([]);
-  const [partySupportUiData, setPartySupportUiData] = useState<any[]>([]); // For table display
-  const [partyChartData, setPartyChartData] = useState<any[]>([]); // For chart display
-  const [allAgencies, setAllAgencies] = useState<string[]>([]); // 모든 조사기관 목록
-  const [selectedAgencies, setSelectedAgencies] = useState<string[]>([]); // 선택된 조사기관들
+  const [candidatePollData, setCandidatePollData] = useState<ChartData[]>([]);
+  const [partySupportUiData, setPartySupportUiData] = useState<ApiPollData['partySupport']>([]);
+  const [partyChartData, setPartyChartData] = useState<ChartData[]>([]);
+  const [allAgencies, setAllAgencies] = useState<string[]>([]);
+  const [selectedAgencies, setSelectedAgencies] = useState<string[]>([]);
 
   // 필터링된 데이터를 반환하는 함수
-  const getFilteredData = (data: any[]) => {
-    if (selectedAgencies.length === 0) return []; // 아무것도 선택되지 않았으면 빈 배열 반환
+  const getFilteredData = (data: ChartData[]) => {
+    if (selectedAgencies.length === 0) return [];
     return data.filter(item => selectedAgencies.includes(item.agency));
   };
 
@@ -26,24 +45,29 @@ export default function HomePage() {
     const fetchData = async () => {
       try {
         const response = await fetch('/election_polling/data/party-support.json');
-        const jsonData = await response.json();
-        setCandidatePollData(jsonData.candidatePolls || []);
+        const jsonData = await response.json() as ApiPollData;
+        setCandidatePollData(jsonData.candidatePolls.map(poll => ({
+          date: poll.date,
+          agency: poll.party,
+          percentage: poll.percentage,
+          candidateName: poll.candidateName
+        })));
         
         const partySupport = jsonData.partySupport || [];
         setPartySupportUiData(partySupport);
 
-        // 조사기관 목록 추출 및 타입 캐스팅
-        const agencies = [...new Set(partySupport.map((poll: any) => poll.agency))] as string[];
+        // 조사기관 목록 추출
+        const agencies = [...new Set(partySupport.map(poll => poll.agency))];
         setAllAgencies(agencies);
-        setSelectedAgencies(agencies); // 초기에는 모든 기관 선택
+        setSelectedAgencies(agencies);
 
         // 차트 데이터 준비
-        if (jsonData.partySupport) {
-          const formattedForChart = jsonData.partySupport.map((poll: any) => ({
+        if (partySupport.length > 0) {
+          const formattedForChart = partySupport.map(poll => ({
             date: poll.date,
             agency: poll.agency,
             ...poll.support
-          })).sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
           setPartyChartData(formattedForChart);
         }
       } catch (error) {
@@ -134,13 +158,13 @@ export default function HomePage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {getFilteredData(partySupportUiData).map((dataEntry: any, index: number) => (
+                {getFilteredData(partyChartData).map((dataEntry, index) => (
                   <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{dataEntry.agency}</td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{dataEntry.date}</td>
                     {partyNames.map(partyName => (
                       <td key={partyName} className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
-                        {dataEntry.support[partyName] !== undefined ? `${dataEntry.support[partyName]}%` : '-'}
+                        {dataEntry[partyName] !== undefined ? `${dataEntry[partyName]}%` : '-'}
                       </td>
                     ))}
                   </tr>

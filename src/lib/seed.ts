@@ -2,6 +2,12 @@
 import { getDb, closeDb } from './db.js';
 import fs from 'node:fs';
 import { parse } from 'csv-parse/sync';
+import { Database } from 'better-sqlite3';
+
+interface RunResult {
+  changes: number;
+  lastInsertRowid: number | bigint;
+}
 
 async function seedPartySupportData() {
   const db = getDb();
@@ -75,7 +81,7 @@ async function seedPartySupportData() {
     let formattedDate = '';
     try {
       rawDate = String(rawDate).trim();
-      let yearPrefix = '20';
+      const yearPrefix = '20';
       let yearStr, monthStr, dayStr;
 
       if (rawDate.includes('~')) {
@@ -106,10 +112,12 @@ async function seedPartySupportData() {
         formattedDate = `${yearPrefix}${yearStr}-${monthStr.padStart(2, '0')}-${dayStr.padStart(2, '0')}`;
       } else {
         throw new Error('Could not parse all date components');
+      }    } catch (e) {
+      if (e instanceof Error) {
+        console.warn(`Skipping record due to date parsing error (rawDate: "${rawDate}"):`, e.message, record);
+      } else {
+        console.warn(`Skipping record due to unknown error (rawDate: "${rawDate}")`, record);
       }
-
-    } catch (e: any) {
-      console.warn(`Skipping record due to date parsing error (rawDate: "${rawDate}"):`, e.message, record);
       continue;
     }
 
@@ -149,12 +157,12 @@ async function main() {
   try {
     db.exec('DELETE FROM Candidate');
     db.exec('DELETE FROM PollingData');
-    console.log('Successfully deleted existing data from Candidate and PollingData tables.');
-  } catch (error: any) { // Added type assertion for error
+    console.log('Successfully deleted existing data from Candidate and PollingData tables.');    } catch (error) {
     console.error('Error deleting data from Candidate/PollingData:', error);
-    if (!(error instanceof Error && error.message.includes('no such table'))) { // Type guard for error
-       // If tables don't exist, it's fine for the first run. Otherwise, rethrow.
+    if (error instanceof Error && !error.message.includes('no such table')) {
+      throw error; // Rethrow if it's not a "no such table" error
     }
+    // If tables don't exist, it's fine for the first run
   }
 
   // Sample Candidate Data (keeping this part as is, or you can modify/remove)
@@ -164,13 +172,11 @@ async function main() {
     { name: 'Candidate C', party: 'Party Z' },
   ];
 
-  const candidateIds: number[] = []; // Explicitly type candidateIds
+  const candidateIds: number[] = [];
   for (const candidate of candidates) {
     const stmt = db.prepare('INSERT INTO Candidate (name, party) VALUES (?, ?)');
-    const result = stmt.run(candidate.name, candidate.party);
-    // @ts-ignore
-    candidateIds.push(result.lastInsertRowid as number);
-    // @ts-ignore
+    const result = stmt.run(candidate.name, candidate.party) as RunResult;
+    candidateIds.push(Number(result.lastInsertRowid));
     console.log(`Inserted candidate: ${candidate.name} with ID: ${result.lastInsertRowid}`);
   }
 

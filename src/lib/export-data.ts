@@ -12,7 +12,14 @@ try {
     const partySupportProcessed: { agency: string; date: string; support: { [key: string]: number } }[] = [];
     const tempPartyDataHolder: { [key: string]: { agency: string; date: string; support: { [key: string]: number } } } = {};
 
-    for (const row of partySupportRaw as any[]) {
+    interface PartySupportRow {
+    agency: string;
+    date: string;
+    partyName: string;
+    supportPercentage: number;
+}
+
+for (const row of partySupportRaw as PartySupportRow[]) {
         const key = `${row.agency}-${row.date}`;
         if (!tempPartyDataHolder[key]) {
             tempPartyDataHolder[key] = {
