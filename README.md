@@ -34,3 +34,11 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+# election
+
+Prisma ORM has been removed. The project now uses better-sqlite3 for direct SQLite access.
+
+- You can safely delete the `prisma/` folder (including `schema.prisma`, `dev.db`, and `dev.db-journal`) if you do not need the old schema or data.
+- All Prisma-related code and dependencies have been removed.
+- Database access is now handled in `src/app/api/polling-data/route.ts` using better-sqlite3.

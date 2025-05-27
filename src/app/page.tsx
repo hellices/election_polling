@@ -1,103 +1,158 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { PollChart } from '@/components/ui/chart';
+
+const partyNames = [
+  "더불어민주당", "국민의힘", "조국혁신당", "개혁신당",
+  "진보당", "기타정당", "지지정당 없음", "모름/무응답"
+];
+
+export default function HomePage() {
+  const [candidatePollData, setCandidatePollData] = useState<any[]>([]);
+  const [partySupportUiData, setPartySupportUiData] = useState<any[]>([]); // For table display
+  const [partyChartData, setPartyChartData] = useState<any[]>([]); // For chart display
+  const [allAgencies, setAllAgencies] = useState<string[]>([]); // 모든 조사기관 목록
+  const [selectedAgencies, setSelectedAgencies] = useState<string[]>([]); // 선택된 조사기관들
+
+  // 필터링된 데이터를 반환하는 함수
+  const getFilteredData = (data: any[]) => {
+    if (selectedAgencies.length === 0) return []; // 아무것도 선택되지 않았으면 빈 배열 반환
+    return data.filter(item => selectedAgencies.includes(item.agency));
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/polling-data');
+        const jsonData = await response.json();
+        setCandidatePollData(jsonData.candidatePolls || []);
+        
+        const partySupport = jsonData.partySupport || [];
+        setPartySupportUiData(partySupport);
+
+        // 조사기관 목록 추출 및 타입 캐스팅
+        const agencies = [...new Set(partySupport.map((poll: any) => poll.agency))] as string[];
+        setAllAgencies(agencies);
+        setSelectedAgencies(agencies); // 초기에는 모든 기관 선택
+
+        // 차트 데이터 준비
+        if (jsonData.partySupport) {
+          const formattedForChart = jsonData.partySupport.map((poll: any) => ({
+            date: poll.date,
+            agency: poll.agency,
+            ...poll.support
+          })).sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          setPartyChartData(formattedForChart);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // 기관 선택 핸들러
+  const handleAgencyChange = (agency: string) => {
+    setSelectedAgencies(prev => {
+      if (prev.includes(agency)) {
+        return prev.filter(a => a !== agency);
+      } else {
+        return [...prev, agency];
+      }
+    });
+  };
+
+  // 전체 선택/해제 핸들러
+  const handleSelectAllAgencies = () => {
+    if (selectedAgencies.length === allAgencies.length) {
+      setSelectedAgencies([]);
+    } else {
+      setSelectedAgencies([...allAgencies]);
+    }
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <main className="flex min-h-screen flex-col items-center p-8 md:p-24 space-y-12">
+      <h1 className="text-2xl font-bold mb-4">대한민국 선거 지지율 추이</h1>
+      
+      {/* Candidate Polling Chart Section */}
+      <section className="w-full max-w-5xl">
+        <h2 className="text-2xl font-semibold mb-6 text-center">대선 후보 지지율</h2>
+        <div className="w-full max-w-4xl mx-auto mb-8 p-4 border rounded-lg shadow">
+          <PollChart data={candidatePollData} />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </section>
+
+      {/* Party Support Section */}
+      <section className="w-full max-w-5xl">
+        <h2 className="text-2xl font-semibold mb-6 text-center">정당 지지율 현황</h2>
+        
+        {/* 조사기관 필터 */}
+        <div className="mb-6 p-4 border rounded-lg">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-lg font-medium">조사기관 필터</h3>
+            <button
+              onClick={handleSelectAllAgencies}
+              className="text-sm text-blue-600 hover:text-blue-800"
+            >
+              {selectedAgencies.length === allAgencies.length ? '전체 해제' : '전체 선택'}
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-4">
+            {allAgencies.map(agency => (
+              <label key={agency} className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={selectedAgencies.includes(agency)}
+                  onChange={() => handleAgencyChange(agency)}
+                  className="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                />
+                <span className="text-sm">{agency}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+        
+        <div className="mb-8 p-4 border rounded-lg shadow">
+          <PollChart data={getFilteredData(partyChartData)} />
+        </div>
+
+        <div>
+          <h3 className="text-xl font-semibold mb-4">정당 지지율 상세 데이터</h3>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 border shadow-sm rounded-lg">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">조사기관</th>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">조사 종료일</th>
+                  {partyNames.map(partyName => (
+                    <th key={partyName} scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{partyName}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {getFilteredData(partySupportUiData).map((dataEntry: any, index: number) => (
+                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{dataEntry.agency}</td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{dataEntry.date}</td>
+                    {partyNames.map(partyName => (
+                      <td key={partyName} className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
+                        {dataEntry.support[partyName] !== undefined ? `${dataEntry.support[partyName]}%` : '-'}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-gray-500 mt-2 text-center">
+            표의 내용이 많을 경우 좌우로 스크롤하여 모든 정당의 지지율을 확인할 수 있습니다.
+          </p>
+        </div>
+      </section>
+    </main>
   );
 }
