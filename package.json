@@ -8,16 +8,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:init": "sqlite3 data/dev.db < schema.sql",
-    "db:seed": "node --loader ts-node/esm src/lib/seed.ts",
-    "db:reset": "npm run db:init && npm run db:seed",
     "export-data": "node --loader ts-node/esm src/lib/export-data.ts",
-    "deploy": "npm run build && touch out/.nojekyll && git add out/ && git commit -m \"Deploy to gh-pages\" && git subtree push --prefix out origin gh-pages"
+    "deploy": "npm run export-data && npm run build && touch out/.nojekyll && git add out/ && git commit -m \"Deploy to gh-pages\" && git subtree push --prefix out origin gh-pages"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tooltip": "^1.2.7",
-    "better-sqlite3": "^11.10.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "csv-parse": "^5.6.0",
@@ -33,7 +29,6 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@tailwindcss/postcss": "^4",
-    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
