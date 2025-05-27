@@ -19,6 +19,11 @@ export function initializeDb(): Database.Database {
   if (dbInstance) {
     return dbInstance;
   }
+  
+  // Enable foreign key support
+  const db = new Database(dbPath);
+  db.pragma('foreign_keys = ON');
+  dbInstance = db;
   console.log('Initializing database connection and schema...');
   dbInstance = new Database(dbPath, { verbose: console.log });
   try {

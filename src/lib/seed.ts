@@ -152,13 +152,15 @@ async function seedPartySupportData() {
 
 async function main() {
   const db = getDb();
-
-  // Clear existing candidate and polling data
+  // Clear existing polling data first, then candidates
   try {
-    db.exec('DELETE FROM Candidate');
+    // Delete from PollingData first to respect foreign key constraints
     db.exec('DELETE FROM PollingData');
-    console.log('Successfully deleted existing data from Candidate and PollingData tables.');    } catch (error) {
-    console.error('Error deleting data from Candidate/PollingData:', error);
+    // Then delete from Candidate
+    db.exec('DELETE FROM Candidate');
+    console.log('Successfully deleted existing data from PollingData and Candidate tables.');
+  } catch (error) {
+    console.error('Error deleting data from PollingData/Candidate:', error);
     if (error instanceof Error && !error.message.includes('no such table')) {
       throw error; // Rethrow if it's not a "no such table" error
     }
