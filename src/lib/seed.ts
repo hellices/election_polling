@@ -1,6 +1,6 @@
 // filepath: c:\\Users\\inhwanhwang\\vscode\\election\\src\\lib\\seed.ts
 import { getDb, closeDb } from './db.js';
-import fs from 'fs';
+import fs from 'node:fs';
 import { parse } from 'csv-parse/sync';
 
 async function seedPartySupportData() {
