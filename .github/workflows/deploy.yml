@@ -21,10 +21,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-          cache: 'npm'
+          cache: 'npm'      - name: Install dependencies
+        run: npm ci
 
-      - name: Install dependencies
-        run: npm ci      - name: Install SQLite
+      - name: Install SQLite
         run: |
           sudo apt-get update
           sudo apt-get install -y sqlite3
