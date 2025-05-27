@@ -2,8 +2,6 @@
 import { getDb, closeDb } from './db.js';
 import fs from 'node:fs';
 import { parse } from 'csv-parse/sync';
-import { Database } from 'better-sqlite3';
-
 interface RunResult {
   changes: number;
   lastInsertRowid: number | bigint;
@@ -15,10 +13,9 @@ async function seedPartySupportData() {
   // Clear existing party support data
   try {
     db.exec('DELETE FROM PartySupport');
-    console.log('Successfully deleted existing data from PartySupport table.');
-  } catch (error: any) { // Added type assertion for error
+    console.log('Successfully deleted existing data from PartySupport table.');  } catch (error) {
     console.error('Error deleting data from PartySupport:', error);
-    if (!(error instanceof Error && error.message.includes('no such table'))) { // Type guard for error
+    if (error instanceof Error && !error.message.includes('no such table')) {
       throw error;
     }
   }

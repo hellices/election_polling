@@ -30,7 +30,6 @@ interface ChartData {
 
 export default function HomePage() {
   const [candidatePollData, setCandidatePollData] = useState<ChartData[]>([]);
-  const [partySupportUiData, setPartySupportUiData] = useState<ApiPollData['partySupport']>([]);
   const [partyChartData, setPartyChartData] = useState<ChartData[]>([]);
   const [allAgencies, setAllAgencies] = useState<string[]>([]);
   const [selectedAgencies, setSelectedAgencies] = useState<string[]>([]);
@@ -54,7 +53,6 @@ export default function HomePage() {
         })));
         
         const partySupport = jsonData.partySupport || [];
-        setPartySupportUiData(partySupport);
 
         // 조사기관 목록 추출
         const agencies = [...new Set(partySupport.map(poll => poll.agency))];
