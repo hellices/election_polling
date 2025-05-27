@@ -25,7 +25,7 @@ export default function HomePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/polling-data');
+        const response = await fetch('/election_polling/data/party-support.json');
         const jsonData = await response.json();
         setCandidatePollData(jsonData.candidatePolls || []);
         

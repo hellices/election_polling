@@ -5,12 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "npm run export-data && next build",
     "start": "next start",
     "lint": "next lint",
     "db:init": "sqlite3 data/dev.db < schema.sql",
     "db:seed": "node --loader ts-node/esm src/lib/seed.ts",
-    "db:reset": "npm run db:init && npm run db:seed"
+    "db:reset": "npm run db:init && npm run db:seed",
+    "export-data": "node --loader ts-node/esm src/lib/export-data.ts",
+    "deploy": "npm run build && touch out/.nojekyll && git add out/ && git commit -m \"Deploy to gh-pages\" && git subtree push --prefix out origin gh-pages"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
