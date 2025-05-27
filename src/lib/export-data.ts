@@ -51,15 +51,6 @@ for (const row of partySupportRaw as PartySupportRow[]) {
         return a.agency.localeCompare(b.agency);
     });
 
-    // Prepare data for chart
-    const formattedForChart = partySupportProcessed
-        .map((poll) => ({
-            date: poll.date,
-            agency: poll.agency,
-            ...poll.support,
-        }))
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
     // Process data and write to public/data directory
     fs.writeFileSync(
         path.join(publicDir, 'party-support.json'),
