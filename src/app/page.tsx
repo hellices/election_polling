@@ -47,7 +47,8 @@ export default function HomePage() {
         const basePath = typeof window !== 'undefined' && window.location.hostname === 'localhost' ? '' : '/election_polling';
         const response = await fetch(`${basePath}/data/party-support.json`);
         const jsonData = await response.json() as ApiPollData;
-        setCandidatePollData(jsonData.candidatePolls.map(poll => ({
+        const candidatePolls = jsonData.candidatePolls || [];
+        setCandidatePollData(candidatePolls.map(poll => ({
           date: poll.date,
           agency: poll.party,
           percentage: poll.percentage,
