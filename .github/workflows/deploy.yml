@@ -24,12 +24,12 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
-
-      - name: Install SQLite
+        run: npm ci      - name: Install SQLite
         run: |
           sudo apt-get update
-          sudo apt-get install -y sqlite3      - name: Create and initialize database
+          sudo apt-get install -y sqlite3
+
+      - name: Create and initialize database
         run: |
           sqlite3 database.db < schema.sql
           npm run db:seed
