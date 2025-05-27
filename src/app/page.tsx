@@ -43,7 +43,9 @@ export default function HomePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/election_polling/data/party-support.json`);
+        // Use dynamic base path check for both local development and production
+        const basePath = typeof window !== 'undefined' && window.location.hostname === 'localhost' ? '' : '/election_polling';
+        const response = await fetch(`${basePath}/data/party-support.json`);
         const jsonData = await response.json() as ApiPollData;
         setCandidatePollData(jsonData.candidatePolls.map(poll => ({
           date: poll.date,
