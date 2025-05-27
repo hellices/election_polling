@@ -29,12 +29,10 @@ jobs:
       - name: Install SQLite
         run: |
           sudo apt-get update
-          sudo apt-get install -y sqlite3
-
-      - name: Initialize database
+          sudo apt-get install -y sqlite3      - name: Create and initialize database
         run: |
           sqlite3 database.db < schema.sql
-          sqlite3 database.db < seed.sql
+          npm run db:seed
 
       - name: Export data to JSON
         run: npm run export-data
