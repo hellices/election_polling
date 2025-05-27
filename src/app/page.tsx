@@ -43,7 +43,7 @@ export default function HomePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/election_polling/data/party-support.json');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/data/party-support.json`);
         const jsonData = await response.json() as ApiPollData;
         setCandidatePollData(jsonData.candidatePolls.map(poll => ({
           date: poll.date,

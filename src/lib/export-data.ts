@@ -1,6 +1,14 @@
 import { getDb } from './db.js';
+import path from 'node:path';
+import fs from 'node:fs';
 
 const db = getDb();
+
+// Ensure public/data directory exists
+const publicDir = path.join(process.cwd(), 'public', 'data');
+if (!fs.existsSync(publicDir)) {
+    fs.mkdirSync(publicDir, { recursive: true });
+}
 
 try {
     // Fetch party support data
@@ -52,21 +60,14 @@ for (const row of partySupportRaw as PartySupportRow[]) {
         }))
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-    // Write data to JSON files
-    const fs = await import('fs');
-    const path = await import('path');
-    
-    const publicDir = './public/data';
-    if (!fs.existsSync(publicDir)) {
-        fs.mkdirSync(publicDir, { recursive: true });
-    }
-
+    // Process data and write to public/data directory
     fs.writeFileSync(
         path.join(publicDir, 'party-support.json'),
-        JSON.stringify({ partySupport: partySupportProcessed, formattedForChart })
+        JSON.stringify({ partySupport: partySupportProcessed })
     );
 
     console.log('Data exported successfully to public/data/party-support.json');
 } catch (error) {
     console.error('Error exporting data:', error);
+    process.exit(1);
 }
