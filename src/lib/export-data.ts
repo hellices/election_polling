@@ -1,4 +1,4 @@
-import { getDb } from './db';
+import { getDb } from '../lib/db';
 
 const db = getDb();
 

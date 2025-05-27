@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "npm run export-data && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "db:init": "sqlite3 data/dev.db < schema.sql",
