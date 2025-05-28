@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { PollChart } from '@/components/ui/chart';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const partyNames = [
   "더불어민주당", "국민의힘", "조국혁신당", "개혁신당",
@@ -32,8 +34,8 @@ export default function HomePage() {
   const [partyChartData, setPartyChartData] = useState<ChartData[]>([]);
   const [allAgencies, setAllAgencies] = useState<string[]>([]);
   const [selectedAgencies, setSelectedAgencies] = useState<string[]>([]);
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
 
   // 필터링된 데이터를 반환하는 함수
   const getFilteredData = (data: ChartData[]) => {
@@ -42,10 +44,10 @@ export default function HomePage() {
     
     // 날짜 범위 필터링
     if (startDate) {
-      filteredData = filteredData.filter(item => new Date(item.date) >= new Date(startDate));
+      filteredData = filteredData.filter(item => new Date(item.date) >= startDate);
     }
     if (endDate) {
-      filteredData = filteredData.filter(item => new Date(item.date) <= new Date(endDate));
+      filteredData = filteredData.filter(item => new Date(item.date) <= endDate);
     }
     
     // 조사 종료일 기준 내림차순으로 정렬
@@ -144,22 +146,24 @@ export default function HomePage() {
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
               <label htmlFor="startDate" className="text-sm whitespace-nowrap">시작일:</label>
-              <input
+              <DatePicker
                 id="startDate"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                dateFormat="yyyy-MM-dd"
                 className="border rounded p-1 text-sm"
+                placeholderText="시작일 선택"
               />
             </div>
             <div className="flex items-center gap-2">
               <label htmlFor="endDate" className="text-sm whitespace-nowrap">종료일:</label>
-              <input
+              <DatePicker
                 id="endDate"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+                selected={endDate}
+                onChange={(date) => setEndDate(date)}
+                dateFormat="yyyy-MM-dd"
                 className="border rounded p-1 text-sm"
+                placeholderText="종료일 선택"
               />
             </div>
           </div>
