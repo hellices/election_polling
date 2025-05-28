@@ -103,6 +103,11 @@ export default function HomePage() {
       setSelectedAgencies([]);
     } else {
       setSelectedAgencies([...allAgencies]);
+  // 차트 드래그로 날짜 범위 선택 핸들러
+  const handleChartDateRangeSelect = (start: Date, end: Date) => {
+    setStartDate(start);
+    setEndDate(end);
+  };
     }
   };
 
@@ -170,7 +175,10 @@ export default function HomePage() {
         </div>
         
         <div className="mb-8 p-4 border rounded-lg shadow">
-          <PollChart data={getFilteredData(partyChartData)} />
+          <PollChart 
+            data={getFilteredData(partyChartData)} 
+            onDateRangeSelect={handleChartDateRangeSelect}
+          />
         </div>
 
         <div>
