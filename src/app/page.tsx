@@ -103,12 +103,13 @@ export default function HomePage() {
       setSelectedAgencies([]);
     } else {
       setSelectedAgencies([...allAgencies]);
+    }
+  };
+
   // 차트 드래그로 날짜 범위 선택 핸들러
   const handleChartDateRangeSelect = (start: Date, end: Date) => {
     setStartDate(start);
     setEndDate(end);
-  };
-    }
   };
 
   return (
