@@ -29,7 +29,6 @@ interface ChartData {
 }
 
 export default function HomePage() {
-  const [candidatePollData, setCandidatePollData] = useState<ChartData[]>([]);
   const [partyChartData, setPartyChartData] = useState<ChartData[]>([]);
   const [allAgencies, setAllAgencies] = useState<string[]>([]);
   const [selectedAgencies, setSelectedAgencies] = useState<string[]>([]);
@@ -60,13 +59,6 @@ export default function HomePage() {
         const basePath = typeof window !== 'undefined' && window.location.hostname === 'localhost' ? '' : '/election_polling';
         const response = await fetch(`${basePath}/data/party-support.json`);
         const jsonData = await response.json() as ApiPollData;
-        const candidatePolls = jsonData.candidatePolls || [];
-        setCandidatePollData(candidatePolls.map(poll => ({
-          date: poll.date,
-          agency: poll.party,
-          percentage: poll.percentage,
-          candidateName: poll.candidateName
-        })));
         
         const partySupport = jsonData.partySupport || [];
 
