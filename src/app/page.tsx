@@ -148,6 +148,9 @@ export default function HomePage() {
         {/* 기간 검색 필터 */}
         <div className="mb-6 p-4 border rounded-lg">
           <h3 className="text-lg font-medium mb-2">기간 검색</h3>
+          <p className="text-xs text-gray-500 mb-3">
+            달력에서 날짜를 선택하거나, 아래 차트에서 직접 드래그하여 기간을 선택할 수 있습니다.
+          </p>
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
               <label htmlFor="startDate" className="text-sm whitespace-nowrap">시작일:</label>
@@ -171,6 +174,18 @@ export default function HomePage() {
                 placeholderText="종료일 선택"
               />
             </div>
+            {/* 날짜 초기화 버튼 */}
+            {(startDate || endDate) && (
+              <button
+                onClick={() => {
+                  setStartDate(null);
+                  setEndDate(null);
+                }}
+                className="text-sm text-blue-600 hover:text-blue-800 underline"
+              >
+                날짜 필터 초기화
+              </button>
+            )}
           </div>
         </div>
         

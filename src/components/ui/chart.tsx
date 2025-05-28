@@ -82,6 +82,10 @@ export function PollChart({ data, onDateRangeSelect }: ChartProps) {
     let dateLeft = new Date(refAreaLeft);
     let dateRight = new Date(refAreaRight);
 
+    // Fix for timezone issues - set to midnight local time
+    dateLeft.setHours(0, 0, 0, 0);
+    dateRight.setHours(23, 59, 59, 999);
+
     if (dateLeft > dateRight) {
       [dateLeft, dateRight] = [dateRight, dateLeft];
     }
