@@ -1,6 +1,13 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, TooltipProps, ReferenceArea } from 'recharts';
 import { useState } from 'react';
 
+// Type for recharts mouse events
+interface ChartMouseEvent {
+  activeLabel?: string;
+  activePayload?: Array<unknown>;
+  activeCoordinate?: { x: number; y: number };
+}
+
 interface ChartProps {
   data: {
     date: string;
@@ -58,13 +65,13 @@ export function PollChart({ data, onDateRangeSelect }: ChartProps) {
   const candidateNames = Object.keys(data[0]).filter(key => key !== 'date' && key !== 'agency');
 
   // 드래그 시작
-  const handleMouseDown = (e: any) => {
+  const handleMouseDown = (e: ChartMouseEvent) => {
     if (!e || !e.activeLabel) return;
     setRefAreaLeft(e.activeLabel);
   };
 
   // 드래그 중
-  const handleMouseMove = (e: any) => {
+  const handleMouseMove = (e: ChartMouseEvent) => {
     if (!e || !e.activeLabel || !refAreaLeft) return;
     setRefAreaRight(e.activeLabel);
   };
